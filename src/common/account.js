@@ -2,6 +2,8 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 import path from 'path';
 import { createDir, writeJson, readJson, readDirJson } from './utils.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // 密钥库存储目录
 const KEYSTORE_DIR = path.resolve(process.cwd(), 'keystores');
@@ -170,4 +172,8 @@ export function getAccountFromKeystores(address, password) {
         console.error('从keystores获取账户失败:', error);
         return null;
     }
+}
+
+export function getLocalAccount() {
+    return privateKeyToAccount(process.env.PRIVATEKEY);
 }
