@@ -1,0 +1,10 @@
+{
+    "number": 1,
+    "password": "123456",
+    "okx": {
+        "apiKey": "",
+        "apiSecret": "",
+        "apiPassphrase": "",
+        "projectId": ""
+    }
+}

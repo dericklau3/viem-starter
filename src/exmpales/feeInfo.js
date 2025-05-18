@@ -1,4 +1,4 @@
-import { getPublicClient } from './common/client.js';
+import { getPublicClient } from '../common/client.js';
 
 async function main() {
     

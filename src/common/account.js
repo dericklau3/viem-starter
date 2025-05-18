@@ -38,10 +38,7 @@ export function generateAccount(password) {
     const keystorePath = path.join(KEYSTORE_DIR, `${account.address}.json`);
     writeJson(keystorePath, keystore);
     
-    return {
-        address: account.address,
-        keystorePath
-    };
+    return account.address;
 }
 
 /**
@@ -174,6 +171,41 @@ export function getAccountFromKeystores(address, password) {
     }
 }
 
+export function getLocalPrivateKey() {
+    return process.env.PRIVATEKEY;
+}
+
 export function getLocalAccount() {
     return privateKeyToAccount(process.env.PRIVATEKEY);
+}
+
+/**
+ * 导入已有的私钥创建账户并存储
+ * @param {string} privateKey - 已有的私钥
+ * @param {string} password - 用于加密私钥的密码
+ * @returns {string} - 返回账户地址
+ */
+export function importAccount(privateKey, password) {
+    // 确保私钥格式正确
+    const formattedPrivateKey = privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`;
+    
+    // 使用私钥创建账户
+    const account = privateKeyToAccount(formattedPrivateKey);
+    
+    // 加密私钥
+    const encryptedPrivateKey = encryptPrivateKey(formattedPrivateKey, password);
+    
+    // 创建密钥库文件
+    const keystore = {
+        address: account.address,
+        crypto: encryptedPrivateKey,
+        id: account.address.substring(2, 10),
+        version: 1
+    };
+    
+    // 存储到文件
+    const keystorePath = path.join(KEYSTORE_DIR, `${account.address}.json`);
+    writeJson(keystorePath, keystore);
+    
+    return account.address;
 }

@@ -3,50 +3,91 @@ import { mainnet, sepolia, bsc, bscTestnet } from 'viem/chains';
 import dotenv from 'dotenv';
 dotenv.config();
 
+// 缓存已创建的客户端实例
+const publicClientCache = {};
+const walletClientCache = {};
+
 export function getPublicClient(network) {
+    // 如果缓存中已有此网络的客户端实例，则直接返回
+    if (publicClientCache[network]) {
+        return publicClientCache[network];
+    }
+
+    let client;
     if (network === 'mainnet') {
-        return createPublicClient({
+        client = createPublicClient({
+            batch: {
+                multicall: true,
+            },
             chain: mainnet,
             transport: http(process.env.MAINNET_NETWORK)
         });
     } else if (network === 'sepolia') {
-        return createPublicClient({
+        client = createPublicClient({
+             batch: {
+                multicall: true,
+            },
             chain: sepolia,
             transport: http(process.env.SEPOLIA_NETWORK)
         });
     } else if (network === 'bsc') {
-        return createPublicClient({
+        client = createPublicClient({
+             batch: {
+                multicall: true,
+            },
             chain: bsc,
             transport: http(process.env.BSC_NETWORK)
         });
     } else {
-        return createPublicClient({
+        client = createPublicClient({
+             batch: {
+                multicall: true,
+            },
             chain: bscTestnet,
             transport: http(process.env.BSCTEST_NETWORK)
         });
     }
+
+    // 将新创建的客户端存入缓存
+    publicClientCache[network] = client;
+    return client;
 }
 
 export function getWalletClient(network) {
+    // 如果缓存中已有此网络的客户端实例，则直接返回
+    if (walletClientCache[network]) {
+        return walletClientCache[network];
+    }
+
+    let client;
     if (network === 'mainnet') {
-        return createWalletClient({
+        client = createWalletClient({
             chain: mainnet,
             transport: http(process.env.MAINNET_NETWORK)
         });
     } else if (network === 'sepolia') {
-        return createWalletClient({
+        client = createWalletClient({
             chain: sepolia,
             transport: http(process.env.SEPOLIA_NETWORK)
         });
     } else if (network === 'bsc') {
-        return createWalletClient({
+        client = createWalletClient({
             chain: bsc,
             transport: http(process.env.BSC_NETWORK)
         });
     } else {
-        return createWalletClient({
+        client = createWalletClient({
             chain: bscTestnet,
             transport: http(process.env.BSCTEST_NETWORK)
         });
     }
+
+    // 将新创建的客户端存入缓存
+    walletClientCache[network] = client;
+    return client;
+}
+
+const legacyChainIds = [bsc.id, bscTestnet.id];
+export function supportEIP1559(publicClient) {
+    return !legacyChainIds.includes(publicClient.chain.id);
 }
