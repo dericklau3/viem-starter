@@ -76,9 +76,9 @@ async function main() {
 
     // await testTokenBalanceOf();
 
-    // await testMultiTokenBalanceOf();
+    await testMultiTokenBalanceOf();
 
-    await testCollectEth();
+    // await testCollectEth();
 
     // const walletClient = getWalletClient('bsctest');
     // const publicClient = getPublicClient('bsctest');

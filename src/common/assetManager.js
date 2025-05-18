@@ -68,7 +68,7 @@ export async function multiBalanceOf(publicClient, addresses) {
 export async function tokenBalanceOf(publicClient, tokenAddress, address) {
     const contract = getContract({
         address: tokenAddress,
-        abi: erc20Abi.abi,
+        abi: erc20Abi,
         client: publicClient,
     });
 
@@ -79,7 +79,7 @@ export async function tokenBalanceOf(publicClient, tokenAddress, address) {
 export async function multiTokenBalanceOf(publicClient, tokenAddress, addresses) {
      const contract = getContract({
         address: tokenAddress,
-        abi: erc20Abi.abi,
+        abi: erc20Abi,
         client: publicClient,
     });
 
