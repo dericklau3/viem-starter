@@ -42,7 +42,7 @@ function testImportAccount() {
   console.log(account);
 }
 
-// node src/exmpales/accountExample.js
+// node src/examples/accountExample.js
 async function main() {
   // createAccount();
 

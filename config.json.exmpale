@@ -6,5 +6,11 @@
         "apiSecret": "",
         "apiPassphrase": "",
         "projectId": ""
+    },
+    "redis": {
+        "host": "",
+        "port": 6319,
+        "password": "",
+        "db": 0
     }
 }

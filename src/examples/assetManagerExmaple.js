@@ -66,7 +66,7 @@ async function testCollectEth() {
 }
 
 
-// node src/exmpales/assetManagerExmaple.js
+// node src/examples/assetManagerExmaple.js
 async function main() {
     // await testTransferEth();
 

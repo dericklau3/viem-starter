@@ -1,3 +1,4 @@
 node_modules
 keystores
 .env
+logs

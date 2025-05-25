@@ -1,6 +1,6 @@
 import { getPublicClient, getWalletClient, supportEIP1559 } from '../common/client.js';
 
-// node src/exmpales/clientExmaple.js
+// node src/examples/clientExmaple.js
 async function main() {
   console.log("第一次调用 getPublicClient('mainnet')");
   const client1 = getPublicClient('mainnet');

@@ -4,6 +4,7 @@ import { readJson } from "../common/utils.js";
 import { getLocalPrivateKey } from '../common/account.js';
 import { parseEther } from 'viem';
 
+// node src/examples/dexExample.js
 async function main() {
     const config = readJson('config.json');
     const publicClient = getPublicClient("bsc");
