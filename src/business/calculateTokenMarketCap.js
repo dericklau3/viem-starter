@@ -13,6 +13,11 @@ const USD1 = '0x8d0D000Ee44948FC98c9B98A4FA4921476f08B0d';
 const BNB_USD_PRICE_FEED = '0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE';
 
 // ABI定义
+const TOKEN_ABI = parseAbi([
+  'function name() external view returns (string memory)',
+  'function symbol() external view returns (string memory)'
+]);
+
 const FACTORY_ABI = parseAbi([
   'function getPair(address tokenA, address tokenB) external view returns (address pair)'
 ]);
@@ -69,6 +74,9 @@ export async function calculateTokenMarketCap() {
         quotoTokens.push(WBNB);
       }
     }
+
+    const tokenNames = await batchGetTokenName(publicClient, tokenAddresses);
+    const tokenSymbols = await batchGetTokenSymbol(publicClient, tokenAddresses);
     
     // 批量获取与WBNB的交易对地址
     const pairAddresses = await batchGetPairAddresses(publicClient, tokenAddresses, quotoTokens);
@@ -78,6 +86,8 @@ export async function calculateTokenMarketCap() {
     for (let i = 0; i < tokenAddresses.length; i++) {
       if (pairAddresses[i] !== '0x0000000000000000000000000000000000000000') {
         validPairs.push({
+          tokenName: tokenNames[i],
+          tokenSymbol: tokenSymbols[i],
           tokenAddress: tokenAddresses[i],
           quotoToken: quotoTokens[i],
           pairAddress: pairAddresses[i]
@@ -97,7 +107,7 @@ export async function calculateTokenMarketCap() {
       
       // 计算价格和市值
       for (let i = 0; i < validPairs.length; i++) {
-        const { tokenAddress, quotoToken, pairAddress } = validPairs[i];
+        const { tokenName, tokenSymbol, tokenAddress, quotoToken, pairAddress } = validPairs[i];
         const token0 = token0Addresses[i];
         const [reserve0, reserve1] = reserves[i];
         
@@ -129,7 +139,7 @@ export async function calculateTokenMarketCap() {
         
         // 如果市值达到0.8M USD，发送POST请求
         if (marketCap >= 600000) {
-          await sendMarketCapAlert(tokenAddress, tokenPriceInUsd, marketCap);
+          await sendMarketCapAlert(tokenAddress, tokenName, tokenSymbol, tokenPriceInUsd, marketCap);
         }
 
       }
@@ -137,6 +147,30 @@ export async function calculateTokenMarketCap() {
   } catch (error) {
     console.error('程序执行出错:', error);
   }
+}
+
+async function batchGetTokenName(publicClient, tokenAddresses) {
+  const contractCalls = tokenAddresses.map(address => (
+    getContract({
+      address,
+      abi: TOKEN_ABI,
+      client: publicClient,
+    }).read.name()
+  ));
+  
+  return await Promise.all(contractCalls);
+}
+
+async function batchGetTokenSymbol(publicClient, tokenAddresses) {
+    const contractCalls = tokenAddresses.map(address => (
+    getContract({
+      address,
+      abi: TOKEN_ABI,
+      client: publicClient,
+    }).read.symbol()
+  ));
+  
+  return await Promise.all(contractCalls);
 }
 
 /**
@@ -204,7 +238,7 @@ async function getBnbPrice(publicClient) {
 /**
  * 发送市值提醒
  */
-async function sendMarketCapAlert(tokenAddress, tokenPrice, marketCap) {
+async function sendMarketCapAlert(tokenAddress, tokenName, tokenSymbol, tokenPrice, marketCap) {
   const redisUtil = getRedisUtil();
   
   try {
@@ -221,9 +255,11 @@ async function sendMarketCapAlert(tokenAddress, tokenPrice, marketCap) {
       ? (marketCap / 1_000_000).toFixed(2) + 'M' 
       : (marketCap / 1_000).toFixed(2) + 'K';
 
-    const message = `Token : ${tokenAddress} \n
-            价格 : ${tokenPrice} USD \n
-            市值 : ${formattedMarketCap}`; // 使用格式化后的市值
+    const message = `Name : ${tokenName} \n` +
+                    `Symbol : ${tokenSymbol} \n` +
+                    `Address : ${tokenAddress} \n` +
+                    `Price : ${tokenPrice} USD \n` +
+                    `Market Cap : ${formattedMarketCap} USD`;
     
     await axios.post('http://43.167.207.101:3000/sendMessage', {
       message: message
