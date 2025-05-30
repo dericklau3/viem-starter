@@ -9,6 +9,7 @@ const BLOCKS_PER_SCAN = 5000; // 每次扫描的区块数量
 const CONTRACT_ADDRESS = '0x5c952063c7fc8610FFDB798152D69F0B9550762b'; // 合约地址
 const EVENT_SIGNATURE = 'event LiquidityAdded(address token0, uint256 amount0, address token1, uint256 amount1)';
 const REDIS_KEY_PREFIX = 'bsc:';
+const STORE_DAY = 7 * 86400;
 
 /**
  * 区块扫描服务
@@ -71,7 +72,7 @@ class BlockScanService {
       };
       
       // 存储到Redis
-      await this.redisUtil.set(`${REDIS_KEY_PREFIX}${key}`, eventData, 259200);
+      await this.redisUtil.set(`${REDIS_KEY_PREFIX}${key}`, eventData, STORE_DAY);
       this.logger.info(`已保存事件: ${key}`);
     }
   }

@@ -137,8 +137,8 @@ export async function calculateTokenMarketCap() {
         // 计算市值
         const marketCap = TOKEN_TOTAL_SUPPLY * tokenPriceInUsd;
         
-        // 如果市值达到0.8M USD，发送POST请求
-        if (marketCap >= 800000) {
+        // 如果市值达到0.5M USD，发送POST请求
+        if (marketCap >= 500000) {
           await sendMarketCapAlert(tokenAddress, tokenName, tokenSymbol, tokenPriceInUsd, marketCap);
         }
 
